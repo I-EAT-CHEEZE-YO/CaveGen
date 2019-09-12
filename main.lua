@@ -4,9 +4,15 @@ require "Lib.Map"
 require "Lib.Player"
 require "Lib.Collision"
 Camera = require "Lib.Camera"
+inventory = require "Lib.Inventory"
+item = require "Lib.Item"
+inv = inventory.new(6,5)
 
 require "Lib.Items"
 require "Lib.Loot"
+
+inventoryGui = require "Lib.InventoryGui"
+inventoryGui:setInventory(inv,32,32)
 
 function love.load()
 	
@@ -40,6 +46,7 @@ function love.update(dt)
 			camera:follow(player.x, player.y)
 			player:update(dt)
 			loot:pickup()
+			inventoryGui:update(player.inventoryXPosition, player.inventoryYPosition)
 		end
 	end
 	collectgarbage()
@@ -55,12 +62,14 @@ function love.draw()
 			loot:draw()
 			player:draw()
 			if game.debug == true then
-				map:drawCollisionData()
+				--map:drawCollisionData()
 			end
 			camera:detach()
 			camera:draw()
-			player.hud:draw(0, 0)
-			player:drawInventory(love.graphics.getWidth() - (64 * 4), 0)
+			player.hud:draw(3, 3)
+			if player.showInventory == true then
+				inventoryGui:draw(player.inventoryXPosition, player.inventoryYPosition)
+			end
 		elseif game.paused == true then
 			pauseMenu:draw()
 		end
@@ -74,6 +83,12 @@ function love.draw()
 			love.graphics.printf("Player Direction : " .. player.dir, 0, 60, 1024, 'center')
 			love.graphics.printf("Player HP = " .. player.health, 0, 75, 1024, 'center')
 			love.graphics.printf("Show Inventory " .. tostring(player.showInventory), 0, 90, 1024, 'center')
+			if player.itemsInInventory == player.maxInventory then
+				love.graphics.printf("Inventory Full", 0, 105, 1024, 'center')
+			else
+				love.graphics.printf("Inventory not Full " .. player.maxInventory - player.itemsInInventory .. " empty slots", 0, 105, 1024, 'center')
+			end
+			love.graphics.printf("CmX = [" .. math.floor(camera.mx / tile.width) .. "] CmY = [" .. math.floor(camera.my / tile.height) .. "]", 0, 120, 1024, 'center')
 		end
 	elseif game.state == 'gameOver' then
 		love.graphics.setNewFont(120)
@@ -101,8 +116,8 @@ function love.keypressed(key)
 				game.debug = true
 			end
 		elseif key == 'f2' then
-			
-    	elseif key == 'space' then
+			player:takeDamage(10)
+    	elseif key == 'tab' then
     		if player.showInventory == true then
     			player.showInventory = false
     		else
@@ -112,5 +127,18 @@ function love.keypressed(key)
     	if game.paused == true then
     		pauseMenu:getInput(key)
     	end
+    elseif game.state == 'gameOver' then
+    	if key == 'space' then
+    		game.state = 'mainMenu'
+    	end
     end
+
+	function love.mousepressed(x,y,b)
+		if game.state == 'gameDebug' then
+			if player.showInventory == true then
+		  		inventoryGui:mousepressed(x,y,b)
+			end
+		end
+	end
+
 end

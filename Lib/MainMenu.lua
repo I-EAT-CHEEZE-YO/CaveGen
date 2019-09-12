@@ -41,6 +41,7 @@ function mainMenu:getInput(key)
 	if key == 'return' then
 		if mainMenu.index == 1 then
 			map:generate('cave', {width = mapWidth, height = mapHeight, iterations = 4})
+			player:reset()
 			game.state = 'gameDebug'
 			mainMenu.index = 1
 		elseif mainMenu.index == 3 then

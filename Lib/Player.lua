@@ -10,12 +10,20 @@ player.dir = 'south'
 player.speed = 150
 player.runSpeed = 215
 player.stamina = 100
-player.health = 94
+player.maxHealth = 100
+player.maxMagic = 100
+player.health = 55
+player.magic = player.maxMagic
+player.itemsInInventory = 0
+player.maxInventory = 30
 player.image = love.graphics.newImage("Assets/Images/Player.png")
 
 player.showInventory = false
 player.inventorySlot = {width = 64, height = 64, image = love.graphics.newImage("Assets/Images/UI/InventorySlot.png")}
 player.inventoryWindow = {width = 64 * 4, height = 640}
+
+player.inventoryXPosition = 3
+player.inventoryYPosition = 96
 
 player.hud = {}
 player.hud.x = 0
@@ -24,15 +32,56 @@ player.hud.width = 100
 player.hud.height = 32
 player.healthBarWidth = player.health - 6
 player.healthBarHeight = 26
+player.magicBarWidth = player.magic - 6
+player.magicBarHeight = 26
+
 player.hud.hpBackgroundImage = love.graphics.newImage("Assets/Images/UI/HP_BG_Image.png")
+player.hud.mpBackgroundImage = love.graphics.newImage("Assets/Images/UI/HP_BG_Image.png")
+
+function player:reset()
+	player.health = 100
+	player.magic = 100
+end
+
+function player:addHealth(ammount)
+	if player.health < player.maxHealth then
+		player.health = player.health + ammount
+	end
+	if player.health > player.maxHealth then
+		player.health = player.maxHealth
+	end
+end
+
+function player:takeDamage(ammount)
+	player.health = player.health - ammount
+	if player.health <= 0 then
+		game.state = 'gameOver'
+	end
+end
+
+function player:addMagic(ammount)
+	if player.magic < player.maxMagic then
+		player.magic = player.health + ammount
+	end
+	if player.magic > player.maxMagic then
+		player.magic = player.maxMagic
+	end
+end
 
 function player.hud:draw(xPos, yPos)
-	love.graphics.draw(player.hud.hpBackgroundImage, xPos, yPos)
 	love.graphics.setColor(1, 0, 0, 1)
 	love.graphics.rectangle('fill', xPos + 3, yPos + 3, player.health, player.healthBarHeight)
 	love.graphics.setColor(1, 1, 1, 1)
+	love.graphics.draw(player.hud.hpBackgroundImage, xPos, yPos)
 	love.graphics.setNewFont("Assets/Fonts/hint-retro.ttf", 32)
-	love.graphics.printf("HP", xPos, 0, 100, 'center')
+	love.graphics.printf("HP", xPos, yPos, 100, 'center')
+
+	love.graphics.setColor(0, 1, 0, 1)
+	love.graphics.rectangle('fill', xPos + 3, (yPos + 35) + 3, player.magic, player.magicBarHeight)
+	love.graphics.setColor(1, 1, 1, 1)
+	love.graphics.draw(player.hud.mpBackgroundImage, xPos, yPos + 35)
+	love.graphics.setNewFont("Assets/Fonts/hint-retro.ttf", 32)
+	love.graphics.printf("MP", xPos, yPos + 35, 100, 'center')
 end
 
 player.inventory = {}
@@ -40,10 +89,6 @@ for i = 1, 10 do
 	table.insert(player.inventory, {name = "empty", type = "none", ammount = 0})
 end
 
-
-function player:addToInventory(item, ammount)
-	--TODO
-end
 
 function player:drawInventory(xPos, yPos)
 	if player.showInventory == true then
@@ -53,11 +98,6 @@ function player:drawInventory(xPos, yPos)
 		love.graphics.setNewFont(12)
 		for i = 1, #player.inventory do
 			love.graphics.draw(player.inventorySlot.image, xPos + 1, (yPos - 64) + (i * 64))
-			if player.inventory[i].name ~= "empty" then
-				love.graphics.draw(player.inventory[i].image, xPos + 1, (yPos - 64) + (i * 64))
-				love.graphics.print(player.inventory[i].ammount, xPos + 12, yPos + (i * 64 - 12))
-			end
-
 		end
 	end
 end
