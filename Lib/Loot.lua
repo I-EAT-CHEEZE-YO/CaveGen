@@ -7,6 +7,7 @@ end
 loot:drop(50, 50, items[1])
 loot:drop(46, 48, items[2])
 loot:drop(55, 60, items[3])
+loot:drop(52, 48, items[3])
 
 function loot:pickup()
 	for i = #loot, 1, -1 do

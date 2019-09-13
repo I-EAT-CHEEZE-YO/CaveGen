@@ -7,8 +7,8 @@ player.width = 12
 player.height = 30
 player.vel = {x = 0, y = 0}
 player.dir = 'south'
-player.speed = 150
-player.runSpeed = 215
+player.speed = 95
+player.runSpeed = 195
 player.stamina = 100
 player.maxHealth = 100
 player.maxMagic = 100
@@ -73,14 +73,14 @@ function player.hud:draw(xPos, yPos)
 	love.graphics.rectangle('fill', xPos + 3, yPos + 3, player.health, player.healthBarHeight)
 	love.graphics.setColor(1, 1, 1, 1)
 	love.graphics.draw(player.hud.hpBackgroundImage, xPos, yPos)
-	love.graphics.setNewFont("Assets/Fonts/hint-retro.ttf", 32)
+	love.graphics.setNewFont("Assets/Fonts/VT323.ttf", 32)
 	love.graphics.printf("HP", xPos, yPos, 100, 'center')
 
-	love.graphics.setColor(0, 1, 0, 1)
+	love.graphics.setColor(0.09, 0.52, 0.94, 1)
 	love.graphics.rectangle('fill', xPos + 3, (yPos + 35) + 3, player.magic, player.magicBarHeight)
 	love.graphics.setColor(1, 1, 1, 1)
 	love.graphics.draw(player.hud.mpBackgroundImage, xPos, yPos + 35)
-	love.graphics.setNewFont("Assets/Fonts/hint-retro.ttf", 32)
+	love.graphics.setNewFont("Assets/Fonts/VT323.ttf", 32)
 	love.graphics.printf("MP", xPos, yPos + 35, 100, 'center')
 end
 
@@ -124,7 +124,7 @@ function player:update(dt)
 		if run then
 			player.speed = player.runSpeed
 		else
-			player.speed = 150
+			player.speed = 95
 		end
 
 		player.oldPos = {x = player.x, y = player.y}

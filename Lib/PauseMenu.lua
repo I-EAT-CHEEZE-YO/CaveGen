@@ -1,7 +1,7 @@
 pauseMenu = {}
 
-pauseMenu.font = love.graphics.newFont("Assets/Fonts/hint-retro.ttf", 32)
-pauseMenu.titleFont = love.graphics.newFont("Assets/Fonts/hint-retro.ttf", 42)
+pauseMenu.font = love.graphics.newFont("Assets/Fonts/VT323.ttf", 32)
+pauseMenu.titleFont = love.graphics.newFont("Assets/Fonts/VT323.ttf", 42)
 pauseMenu.entries = {"Resume", "Options", "Quit to Main Menu", "Quit to Desktop"}
 pauseMenu.index = 1
 pauseMenu.color = {1, 1, 1, 1}
@@ -37,6 +37,9 @@ function pauseMenu:getInput(key)
 	if key == 'return' then
 		if pauseMenu.index == 1 then
 			game.paused = false
+			pauseMenu.index = 1
+		elseif pauseMenu.index == 2 then
+			game.state = 'optionsMenu'
 			pauseMenu.index = 1
 		elseif pauseMenu.index == 3 then
 			game.state = 'mainMenu'

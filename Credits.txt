@@ -1,0 +1,8 @@
+Lead Programmer : Todd Forester
+Lead Artist : Todd Forester
+
+Sound : Todd Forester
+Music : avgvsta LINK : https://opengameart.org/content/generic-8-bit-jrpg-soundtrack
+
+Camera System : STALKER-X by USERNAME
+Love2D Forum User steVeRoll : Basic Inventory System

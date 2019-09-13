@@ -1,4 +1,5 @@
 require "Lib.MainMenu"
+require "Lib.Options"
 require "Lib.PauseMenu"
 require "Lib.Map"
 require "Lib.Player"
@@ -15,18 +16,22 @@ inventoryGui = require "Lib.InventoryGui"
 inventoryGui:setInventory(inv,32,32)
 
 function love.load()
-	
-	math.randomseed(11010110)
-
 	love.graphics.setBackgroundColor(0.05, 0.05, 0.05, 1)
 	love.graphics.setDefaultFilter('nearest', 'nearest', 1)
 
-	print("Width = " .. love.graphics.getWidth() .. " Height = " .. love.graphics.getHeight())
-
 	game = {}
+	game.build = "testing"
 	game.debug = false
 	game.paused = false
 	game.state = 'mainMenu'
+
+	--11010110
+	--os.time()
+	if game.build == "testing" then 
+		math.randomseed(11010110)
+	elseif game.build == "release" then
+		math.randomseed(os.time())
+	end
 
 	mapWidth = 165
 	mapHeight = 75
@@ -39,8 +44,10 @@ function love.load()
 end
 
 function love.update(dt)
-
-	if game.state == "gameDebug" then
+	if game.state == 'mainMenu' then
+		mainMenu.music:play()
+		mainMenu.music:setLooping(true)
+	elseif game.state == "gameDebug" then
 		if game.paused == false then
 			camera:update(dt)
 			camera:follow(player.x, player.y)
@@ -55,6 +62,8 @@ end
 function love.draw()
 	if game.state == 'mainMenu' then
 		mainMenu:draw()
+	elseif game.state == 'optionsMenu' then
+		options:draw()
 	elseif game.state == 'gameDebug' then
 		if game.paused == false then
 			camera:attach()
@@ -68,14 +77,17 @@ function love.draw()
 			camera:draw()
 			player.hud:draw(3, 3)
 			if player.showInventory == true then
+				love.mouse.setVisible(true)
 				inventoryGui:draw(player.inventoryXPosition, player.inventoryYPosition)
+			else
+				love.mouse.setVisible(false)
 			end
 		elseif game.paused == true then
 			pauseMenu:draw()
 		end
 
 		if game.debug == true then
-			love.graphics.setNewFont(14)
+			love.graphics.setNewFont("Assets/Fonts/VT323.ttf", 16)
 			love.graphics.printf("------Debug Mode------", 0, 3, 1024, 'center')
 			love.graphics.printf("Memory Used In KB = " .. math.floor(collectgarbage('count')), 0, 15, 1024, 'center')
 			love.graphics.printf("FPS : " .. love.timer.getFPS(), 0, 30, 1024, 'center')
@@ -91,7 +103,7 @@ function love.draw()
 			love.graphics.printf("CmX = [" .. math.floor(camera.mx / tile.width) .. "] CmY = [" .. math.floor(camera.my / tile.height) .. "]", 0, 120, 1024, 'center')
 		end
 	elseif game.state == 'gameOver' then
-		love.graphics.setNewFont(120)
+		love.graphics.setNewFont("Assets/Fonts/VT323.ttf", 120)
 		love.graphics.setColor(1, 0, 0, 1)
 		love.graphics.printf("Game Over", 0, 240, 1024, 'center')
 	end
@@ -101,6 +113,8 @@ end
 function love.keypressed(key)
 	if game.state == 'mainMenu' then
 		mainMenu:getInput(key)
+	elseif game.state == 'optionsMenu' then
+		options:getInput(key)
 	elseif game.state == 'gameDebug' then
 		if key == 'escape' then
 			if game.paused == true then
