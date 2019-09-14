@@ -1,6 +1,7 @@
 local utils = require "Lib.Utils"
 
-errorSound = love.audio.newSource("Assets/Sounds/menu_tick.wav", "static")
+errorSound = love.audio.newSource("Assets/Sounds/ErrorSound.wav", "static")
+dropSound = love.audio.newSource("Assets/Sounds/DropItem.wav", "static")
 
 inventory = {}
 inventory.__index = inventory
@@ -43,6 +44,7 @@ function inventory:drop(x, y, xPos, yPos)
     if map.data[xPos][yPos] == 1 then
       loot:drop(xPos, yPos, items[self.arr[y][x].id])
       self.arr[y][x] = 0
+      dropSound:play()
     else
       errorSound:play()
     end

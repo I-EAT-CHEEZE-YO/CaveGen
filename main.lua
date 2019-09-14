@@ -37,8 +37,9 @@ function love.load()
 	mapHeight = 75
 
 	camera = Camera()
-	camera:setFollowLerp(0.2)
-	camera:setFollowStyle('TOPDOWN')
+	camera.scale = 1
+	camera:setFollowLerp(0.35)
+	camera:setFollowStyle('TOPDOWN_TIGHT')
 	camera:setBounds(0, 0, (mapWidth * tile.width), (mapHeight * tile.height))
 
 end
