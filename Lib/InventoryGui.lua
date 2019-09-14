@@ -63,6 +63,7 @@ function inventoryGui:mousepressed(x,y,b)
     else
       if selected.is then
         inv:drop(selected.x, selected.y, math.floor(camera.mx / tile.width), math.floor(camera.my / tile.height))
+        player.itemsInInventory = player.itemsInInventory - 1
         selected.is = false
       end
     end
