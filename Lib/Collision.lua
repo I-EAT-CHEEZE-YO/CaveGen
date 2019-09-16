@@ -11,3 +11,23 @@
 			obj1.y = player.oldPos.y
 		end
 	end
+
+	function resolveEnemyCollision(obj1, obj2)
+		if checkCollision(obj1, obj2) then
+			obj1.x = obj1.oldPos.x
+			obj1.y = obj1.oldPos.y
+			if obj1.dir == 1 then
+				obj1.dir = 2
+				obj1.updateTime = 0
+			elseif obj1.dir == 2 then
+				obj1.updateTime = 0
+				obj1.dir = 1
+			elseif obj1.dir == 4 then
+				obj1.dir = 3
+				obj1.updateTime = 0
+			elseif obj1.dir == 3 then
+				obj1.dir = 4
+				obj1.updateTime = 0
+			end
+		end
+	end

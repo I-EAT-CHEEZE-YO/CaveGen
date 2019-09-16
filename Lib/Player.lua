@@ -1,22 +1,39 @@
 player = {}
 
+
+player.damageSound = love.audio.newSource("Assets/Sounds/TakeDamage.wav", "static")
+player.attackImage = love.graphics.newImage("Assets/Images/Player/Attack_South.png")
+
 player.x = 0
 player.y = 0
-
 player.width = 20
 player.height = 28
 player.vel = {x = 0, y = 0}
 player.dir = 'south'
 player.speed = 95
 player.runSpeed = 195
+player.attacking = false
 player.stamina = 100
 player.maxHealth = 100
 player.maxMagic = 100
 player.health = 55
+player.defence = 10
+player.armor = 1
+player.attack = 10
 player.magic = player.maxMagic
 player.itemsInInventory = 0
 player.maxInventory = 30
 player.image = love.graphics.newImage("Assets/Images/Player/Player_South.png")
+player.atkZone = {x = player.x, y = player.y, width = player.width, height = player.height}
+player.agroZone = {x = player.x, y = player.y, width = player.width, height = player.height}
+
+function player:drawAgroZone()
+	love.graphics.setColor(1, 1, 0, 1)
+	love.graphics.rectangle('line', player.agroZone.x, player.agroZone.y, player.agroZone.width, player.agroZone.height)
+	love.graphics.setColor(0, 1, 0, 1)
+	love.graphics.rectangle('line', player.atkZone.x, player.atkZone.y, player.atkZone.width, player.atkZone.height)
+	love.graphics.setColor(1, 1, 1, 1)
+end
 
 function player:animate()
 	if player.dir == 'south' then
@@ -66,6 +83,8 @@ end
 
 function player:takeDamage(ammount)
 	player.health = player.health - ammount
+	player.damageSound:play()
+	camera:flash(0.1, {1, 0, 0, 0.25})
 	if player.health <= 0 then
 		game.state = 'gameOver'
 	end
@@ -129,12 +148,21 @@ end
 function player:update(dt)
 
 	player:animate()
+	player.agroZone = {x = player.x - 64, y = player.y - 64, width = player.width + 128, height = player.height + 128}
+	player.atkZone = {x = player.x, y = player.y, width = player.width, height = player.height}
 
 	local up = love.keyboard.isDown('w', 'up')
 	local down = love.keyboard.isDown('s', 'down')
 	local left = love.keyboard.isDown('a', 'left')
 	local right = love.keyboard.isDown('d', 'right')
 	local run = love.keyboard.isDown('lshift')
+	local attack = love.keyboard.isDown('space')
+
+	if attack and not oldAttack then
+		player.attacking = true
+	else
+		player.attacking = false
+	end
 
 	if run then
 		player.speed = player.runSpeed
@@ -182,10 +210,21 @@ function player:update(dt)
 		game.state = 'gameOver'
 	end
 
+	oldAttack = attack
+
+end
+
+function player:input(key)
+	if key == 'space' then
+		player.attacking = true
+	end
 end
 
 function player:draw()
 	love.graphics.draw(player.image, player.x, player.y)
+	if player.attacking == true then
+		love.graphics.draw(player.attackImage, player.x, player.y)
+	end
 end
 
 return player
