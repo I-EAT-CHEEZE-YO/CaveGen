@@ -10,8 +10,8 @@ function enemy:create(x, y, width, height, image, sound)
 		width = width,
 		height = height,
 		updateTime = 0,
-		updateFrequency = math.random(1, 60),
-		updateAt = math.random(6, 12),
+		updateFrequency = math.random(10, 12),
+		updateAt = math.random(25, 35),
 		speed = math.random(100, 125),
 		dir = math.random(1, 4),
 		vel = {x = 0, y = 0},
@@ -34,10 +34,28 @@ end
 
 enemies = {}
 
-enemies[1] = enemy:create(53, 59, 32, 32, bugImage, bugSound)
-enemies[2] = enemy:create(50, 55, 32, 32, bugImage, bugSound)
-enemies[3] = enemy:create(60, 45, 32, 32, bugImage, bugSound)
-enemies[4] = enemy:create(50, 25, 32, 32, bugImage, bugSound)
+--enemies[1] = enemy:create(53, 59, 32, 32, bugImage, bugSound)
+--enemies[2] = enemy:create(50, 55, 32, 32, bugImage, bugSound)
+--enemies[3] = enemy:create(60, 45, 32, 32, bugImage, bugSound)
+--enemies[4] = enemy:create(50, 45, 32, 32, bugImage, bugSound)
+
+function enemies:spawn(n)
+	local floors = {}
+	for x = 0, map.width do
+		for y = 0, map.height do
+			if map.data[x][y] == 1 then
+				table.insert(floors, {x = x, y = y})
+			end
+		end
+	end
+
+	for i = 1, n do
+		local t = math.random(1, #floors)
+		enemies[i] =  enemy:create(floors[t].x, floors[t].y, 32, 32, bugImage, bugSound)
+	end
+	floors = nil
+end
+
 
 function enemies:draw()
 	if #enemies > 0 then
@@ -56,14 +74,13 @@ function enemies:update(dt)
 			if checkCollision(player.atkZone, enemies[i]) then
 				if player.attacking == true then
 					enemies[i]:takeDamage(player.attack)
-					print("Hit Enemy")
 				end
-				if enemies[i].updateTime > enemies[i].updateFrequency then
+				if enemies[i].updateTime > enemies[i].updateAt then
 					enemies[i]:attack()
 					enemies[i].updateTime = 0
 				end
 			elseif checkCollision(player.agroZone, enemies[i]) then
-				if enemies[i].updateTime > enemies[i].updateFrequency then
+				if enemies[i].updateTime > enemies[i].updateAt then
 					enemies[i].x = enemies[i].x + enemies[i].speed * enemies[i].vel.x * dt
 					enemies[i].y = enemies[i].y + enemies[i].speed * enemies[i].vel.y * dt
 					enemies[i].vel.x = 0
@@ -116,14 +133,14 @@ function enemies:update(dt)
 					resolveEnemyCollision(enemies[i], map.collisionData[j])
 				end
 
-				if enemies[i].updateTime > enemies[i].updateFrequency then
+				if enemies[i].updateTime > enemies[i].updateAt then
 					enemies[i].updateTime = 0
 					enemies[i].dir = math.random(1, 6)
 				end
 			end
 
 			if enemies[i].health <= 0 then
-				loot:drop(enemies[i].x / tile.width, enemies[i].y / tile.height, items[1])
+				loot:drop(enemies[i].x / tile.width, enemies[i].y / tile.height, items[math.random(1, #items)])
 				enemies[i].deathSound:play()
 				table.remove(enemies, i)
 			end
@@ -131,4 +148,6 @@ function enemies:update(dt)
 		end
 	end
 end
+
+return enemies
 

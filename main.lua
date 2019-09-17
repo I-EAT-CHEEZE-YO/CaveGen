@@ -96,10 +96,10 @@ function love.draw()
 			love.graphics.printf("------Debug Mode------", 0, 3, 1024, 'center')
 			love.graphics.printf("Memory Used In KB = " .. math.floor(collectgarbage('count')), 0, 15, 1024, 'center')
 			love.graphics.printf("FPS : " .. love.timer.getFPS(), 0, 30, 1024, 'center')
-			love.graphics.printf("Player Position Tile X[" .. math.floor(player.x / tile.width) .. "] Y[".. math.floor(player.y / tile.height) .. "]", 0, 45, 1024, 'center')
-			love.graphics.printf("Player Position World X[" .. player.x .. "] Y[" .. player.y .. "]", 0, 60, 1024, 'center')
-			love.graphics.printf("Player HP = " .. player.health, 0, 75, 1024, 'center')
-			love.graphics.printf("Show Inventory " .. tostring(player.showInventory), 0, 90, 1024, 'center')
+			love.graphics.printf("Enemies Remaining " .. #enemies, 0, 45, 1024, 'center')
+			love.graphics.printf("", 0, 60, 1024, 'center')
+			love.graphics.printf("", 0, 75, 1024, 'center')
+			love.graphics.printf("", 0, 90, 1024, 'center')
 			if player.itemsInInventory == player.maxInventory then
 				love.graphics.printf("Inventory Full", 0, 105, 1024, 'center')
 			else
@@ -120,7 +120,7 @@ function love.keypressed(key)
 		mainMenu:getInput(key)
 	elseif game.state == 'optionsMenu' then
 		options:getInput(key)
-	elseif game.state == 'gameDebug' then
+	elseif game.state == 'gameDebug' then 
 		if key == 'escape' then
 			if game.paused == true then
 				game.paused = false

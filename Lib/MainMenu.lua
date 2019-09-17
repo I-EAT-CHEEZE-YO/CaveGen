@@ -43,6 +43,7 @@ function mainMenu:getInput(key)
 		if mainMenu.index == 1 then
 			mainMenu.music:stop()
 			map:generate('cave', {width = mapWidth, height = mapHeight, iterations = 4})
+			enemies:spawn(15)
 			player:reset()
 			game.state = 'gameDebug'
 			mainMenu.index = 1
