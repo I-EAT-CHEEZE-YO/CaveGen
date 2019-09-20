@@ -2,6 +2,7 @@ player = {}
 
 
 player.damageSound = love.audio.newSource("Assets/Sounds/TakeDamage.wav", "static")
+player.attackSound = love.audio.newSource("Assets/Sounds/ShootArrow.wav", "static")
 player.attackImage = love.graphics.newImage("Assets/Images/Player/Attack_South.png")
 
 player.x = 0
@@ -21,6 +22,7 @@ player.defence = 10
 player.armor = 1
 player.attack = 10
 player.magic = player.maxMagic
+player.gold = 0
 player.itemsInInventory = 0
 player.maxInventory = 30
 player.image = love.graphics.newImage("Assets/Images/Player/Player_South.png")
@@ -156,13 +158,6 @@ function player:update(dt)
 	local left = love.keyboard.isDown('a', 'left')
 	local right = love.keyboard.isDown('d', 'right')
 	local run = love.keyboard.isDown('lshift')
-	local attack = love.keyboard.isDown('space')
-
-	if attack and not oldAttack then
-		player.attacking = true
-	else
-		player.attacking = false
-	end
 
 	if run then
 		player.speed = player.runSpeed

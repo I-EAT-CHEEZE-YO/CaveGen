@@ -43,10 +43,12 @@ function inventory:drop(x, y, xPos, yPos)
   if self.arr[y][x].id ~= -1 then
     if map.data[xPos][yPos] == 1 then
       loot:drop(xPos, yPos, items[self.arr[y][x].id])
+      console:addMessage("Dropped " .. items[self.arr[y][x].id].name, {0.12, 0.12, 0.12, 1}, 5)
       self.arr[y][x] = 0
       dropSound:play()
     else
       errorSound:play()
+      console:addMessage(items[self.arr[y][x].id].name .. " Can't Be Dropped Here", {0.12, 0.12, 0.12, 1}, 5)
     end
   end
 end

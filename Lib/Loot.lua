@@ -18,16 +18,19 @@ function loot:pickup()
 					inv:addItem(item.new("Potion of Minor Healing","Assets/Images/UI/HealthPotionUI.png","Recover Some HP.", 1))
 					table.remove(loot, i)
 					player.itemsInInventory = player.itemsInInventory + 1
+					console:addMessage("Picked Up Potion of Minor Healing", {0.12, 0.12, 0.12, 1}, 5)
 				elseif loot[i].name == "Potion of Minor Magic" then
 					loot[i].sound:play()
 					inv:addItem(item.new("Potion of Minor Magic","Assets/Images/UI/MagicPotionUI.png","Recover Some MP.", 2))
 					table.remove(loot, i)
 					player.itemsInInventory = player.itemsInInventory + 1
-				elseif loot[i].name == "Dungeon Key" then
+					console:addMessage("Picked Up Potion of Minor Magic", {0.12, 0.12, 0.12, 1}, 5)
+				elseif loot[i].name == "Gold" then
+					local gp = math.random(10, 78)
 					loot[i].sound:play()
-					inv:addItem(item.new("Dungeon Key","Assets/Images/UI/DungeonKeyUI.png","Unlocks A Locked Door or Chest.", 3))
+					player.gold = player.gold + gp
 					table.remove(loot, i)
-					player.itemsInInventory = player.itemsInInventory + 1
+					console:addMessage("Picked Up " .. gp .. " Gold", {0.12, 0.12, 0.12, 1}, 5)
 				end
 			end
 		end

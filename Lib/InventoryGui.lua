@@ -20,8 +20,6 @@ function inventoryGui:setInventory(inventory,iconW,iconH)
   itemDrawH = iconH
 end
 
-love.mouse.setVisible(true)
-
 local mx,my = love.mouse.getPosition()
 
 local mouseOn = {is=false,x=1,y=1}
@@ -73,15 +71,25 @@ function inventoryGui:mousepressed(x,y,b)
         if inv.arr[mouseOn.y][mouseOn.x] ~= 0 then
           if inv.arr[mouseOn.y][mouseOn.x].name == "Potion of Minor Healing" then
             if player.health < player.maxHealth then
-              player:addHealth(math.random(5, 15))
+              local hp = math.random(5, 15)
+              player:addHealth(hp)
+              console:addMessage(hp .. " HP Recovered from Minor Healing Potion!", {0.22, 0.12, 0.12, 1}, 5)
               inv:remove(mouseOn.x, mouseOn.y)
               player.itemsInInventory = player.itemsInInventory - 1
+            else
+              errorSound:play()
+              console:addMessage("Health Already Full", {0.22, 0.12, 0.12, 1}, 5)
             end
           elseif inv.arr[mouseOn.y][mouseOn.x].name == "Potion of Minor Magic" then
             if player.magic < player.maxMagic then
-              player:addMagic(math.random(5, 15))
+              local mp = math.random(5, 15)
+              player:addMagic(mp)
+              console:addMessage(mp .. " MP Recovered from Minor Magic Potion!", {0.12, 0.12, 0.22, 1}, 5)
               inv:remove(mouseOn.x, mouseOn.y)
               player.itemsInInventory = player.itemsInInventory - 1
+            else
+              errorSound:play()
+              console:addMessage("Magic Already Full", {0.12, 0.12, 0.22, 1}, 5)
             end
           end
         end

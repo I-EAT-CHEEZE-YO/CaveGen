@@ -24,8 +24,10 @@ function enemy:create(x, y, width, height, image, sound)
 		attack = function(self)
 			player:takeDamage(self.attackDamage)
 			self.attackDamage = math.random(1, self.lvl * 10)
+			console:addMessage("Took " .. self.attackDamage .. " Points of Damage!", {0.12, 0.12, 0.12, 1}, 5)
 		end,
 		takeDamage = function(self, ammount)
+			player.attackSound:play()
 			self.health = self.health - ammount
 		end
 	}
@@ -66,20 +68,54 @@ function enemies:draw()
 end
 
 function enemies:update(dt)
+	local mouse = {x = camera.mx, y = camera.my, width = 10, height = 10}
+	local playerMainAttack = love.mouse.isDown(1)
+	local playerSecondaryAttack = love.mouse.isDown(2)
+
 	if #enemies > 0 then
 		for i = #enemies, 1, -1 do
 
 			enemies[i].updateTime = enemies[i].updateTime + enemies[i].updateFrequency * dt
 
 			if checkCollision(player.atkZone, enemies[i]) then
-				if player.attacking == true then
-					enemies[i]:takeDamage(player.attack)
+				if checkCollision(mouse, enemies[i]) then
+					if playerMainAttack and not oldPlayerMainAttack then
+						local atk = math.random(3, 8)
+						player.attacking = true
+						enemies[i]:takeDamage(atk)
+						console:addMessage("Hit Bug For " .. atk .. " Damage!", {0.12, 0.12, 0.12, 1}, 5)
+					else
+						player.attacking = false
+					end
+				elseif checkCollision(mouse, enemies[i]) then
+					if playerSecondaryAttack and not oldPlayerSecondaryAttack then
+						local mp = math.random(1, 12)
+						if player.magic >= mp then
+							enemies[i]:takeDamage(player.attack)
+							console:addMessage("Hit Bug For " .. mp .. " Damage!", {0.12, 0.12, 0.12, 1}, 5)
+							player.magic = player.magic - mp
+						else
+							console:addMessage("Not Enough MP", {0.12, 0.12, 0.12, 1}, 5)
+						end
+					end
 				end
 				if enemies[i].updateTime > enemies[i].updateAt then
 					enemies[i]:attack()
 					enemies[i].updateTime = 0
 				end
 			elseif checkCollision(player.agroZone, enemies[i]) then
+				if checkCollision(mouse, enemies[i]) then
+					if playerSecondaryAttack and not oldPlayerSecondaryAttack then
+						local mp = math.random(1, 12)
+						if player.magic >= mp then
+							enemies[i]:takeDamage(player.attack)
+							console:addMessage("Hit Bug For " .. mp .. " Damage!", {0.12, 0.12, 0.12, 1}, 5)
+							player.magic = player.magic - mp
+						else
+							console:addMessage("Not Enough MP", {0.12, 0.12, 0.12, 1}, 5)
+						end
+					end
+				end
 				if enemies[i].updateTime > enemies[i].updateAt then
 					enemies[i].x = enemies[i].x + enemies[i].speed * enemies[i].vel.x * dt
 					enemies[i].y = enemies[i].y + enemies[i].speed * enemies[i].vel.y * dt
@@ -143,10 +179,14 @@ function enemies:update(dt)
 				loot:drop(enemies[i].x / tile.width, enemies[i].y / tile.height, items[math.random(1, #items)])
 				enemies[i].deathSound:play()
 				table.remove(enemies, i)
+				console:addMessage("Bug Defeated!", {0.12, 0.12, 0.12, 1}, 5)
+				player.attacking = false
 			end
 
 		end
 	end
+	oldPlayerMainAttack = playerMainAttack
+	oldPlayerSecondaryAttack = playerSecondaryAttack
 end
 
 return enemies

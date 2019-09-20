@@ -20,8 +20,9 @@ map.collisionData = {} -- {ID, x, y, width, height}
 tile = {width = 32, height = 32}
 
 tiles = {
-	floor = love.graphics.newImage("Assets/Images/Floor.png"),
-	wall = love.graphics.newImage("Assets/Images/Wall.png"),
+	floor = love.graphics.newImage("Assets/Images/DungeonTiles/Floor_01.png"),
+	roof = love.graphics.newImage("Assets/Images/DungeonTiles/Roof_01.png"),
+	wall = love.graphics.newImage("Assets/Images/DungeonTiles/Wall_01.png"),
 	top_left_corner = love.graphics.newImage("Assets/Images/TopLeftCorner.png"),
 	top_right_corner = love.graphics.newImage("Assets/Images/TopRightCorner.png"),
 	bottom_left_corner = love.graphics.newImage("Assets/Images/BottomLeftCorner.png"),
@@ -103,16 +104,18 @@ function map:fixCorners()
 				if map.data[x-1][y-1] == 0 and map.data[x][y-1] == 0 and map.data[x-1][y] == 0 then
 					map.data[x][y] = "tlc"
 				end
-				if map.data[x][y-1] == 0 and map.data[x+1][y-1] == 0 and map.data[x+1][y] == 0 then
-					map.data[x][y] = "trc"
-				end
-				if map.data[x-1][y] == 0 and map.data[x-1][y+1] == 0 and map.data[x][y+1] == 0 then
-					map.data[x][y] = "blc"
-				end
-				if map.data[x+1][y] == 0 and map.data[x+1][y+1] == 0 and map.data[x][y+1] == 0 then
-					map.data[x][y] = "brc"
-				end
+			end
+		end
+	end
+end
 
+function map:fixWalls()
+	for x = 0, map.width do
+		for y = 0, map.height do
+			if map.data[x][y] == 0 then
+				if map.data[x][y+1] == 1 then
+					map.data[x][y+1] = "w"
+				end
 			end
 		end
 	end
@@ -123,7 +126,7 @@ function map:populateCollisionData()
 	local nWalls = 0
 	for x = 0, map.width do
 		for y = 0, map.height do
-			if map.data[x][y] == 0 then
+			if map.data[x][y] ~= 1 then
 				table.insert(map.collisionData, {id = nWalls, x = x * tile.width, y = y * tile.height, width = tile.width, height = tile.height})
 				nWalls = nWalls + 1
 			end
@@ -136,7 +139,7 @@ function map:repopulateCollisionData()
 	local nWalls = 0
 	for x = 0, map.width do
 		for y = 0, map.height do
-			if map.data[x][y] == 0 then
+			if map.data[x][y] ~= 1 then
 				table.insert(map.collisionData, {id = nWalls, x = x * tile.width, y = y * tile.height, width = tile.width, height = tile.height})
 				nWalls = nWalls + 1
 			end
@@ -163,6 +166,7 @@ function map:generate(type, args)
 		for i = 1, map.iterations do
 			map:iterate()
 		end
+		map:fixWalls()
 		map:populateCollisionData()
 		player:pickSpawn()
 	end
@@ -181,7 +185,9 @@ function map:draw(xOffset, yOffset)
 		for y = 0, map.height do
 			if map.data[x][y] == 1 then --FLOOR
 				love.graphics.draw(tiles.floor, xOffset + (x * tile.width), yOffset + (y * tile.height))
-			elseif map.data[x][y] == 0 then --WALL
+			elseif map.data[x][y] == 0 then --ROOF
+				love.graphics.draw(tiles.roof, xOffset + (x * tile.width), yOffset + (y * tile.height))
+			elseif map.data[x][y] == 'w' then --WALL
 				love.graphics.draw(tiles.wall, xOffset + (x * tile.width), yOffset + (y * tile.height))
 			elseif map.data[x][y] == "tlc" then
 				love.graphics.draw(tiles.top_left_corner, xOffset + (x * tile.width), yOffset + (y * tile.height))

@@ -1,5 +1,6 @@
 require "Lib.MainMenu"
 require "Lib.Options"
+require "Lib.Console"
 require "Lib.PauseMenu"
 require "Lib.Map"
 require "Lib.Player"
@@ -20,11 +21,15 @@ function love.load()
 	love.graphics.setBackgroundColor(0.05, 0.05, 0.05, 1)
 	love.graphics.setDefaultFilter('nearest', 'nearest', 1)
 
+	loadingScreen = love.graphics.newImage("Assets/Images/UI/LoadingScreen.png")
+
 	game = {}
 	game.build = "testing"
 	game.debug = false
 	game.paused = false
 	game.state = 'mainMenu'
+	game.timer = 0
+	game.ready = false
 
 	--11010110
 	--os.time()
@@ -38,10 +43,10 @@ function love.load()
 	mapHeight = 75
 
 	camera = Camera()
-	camera.scale = 1
-	camera:setFollowLerp(0.35)
-	camera:setFollowStyle('TOPDOWN_TIGHT')
+	camera:setFollowLerp(0.15)
+	camera:setFollowStyle('TOPDOWN')
 	camera:setBounds(0, 0, (mapWidth * tile.width), (mapHeight * tile.height))
+	camera.scale = 1
 
 end
 
@@ -50,6 +55,12 @@ function love.update(dt)
 		mainMenu.music:play()
 		mainMenu.music:setLooping(true)
 	elseif game.state == "gameDebug" then
+		game.timer = game.timer + 1 * dt
+
+		if game.timer > 1 then
+			game.ready = true
+		end
+
 		if game.paused == false then
 			camera:update(dt)
 			camera:follow(player.x, player.y)
@@ -57,6 +68,7 @@ function love.update(dt)
 			player:update(dt)
 			loot:pickup()
 			inventoryGui:update(player.inventoryXPosition, player.inventoryYPosition)
+			console:update(dt)
 		end
 	end
 	collectgarbage()
@@ -81,11 +93,9 @@ function love.draw()
 			camera:detach()
 			camera:draw()
 			player.hud:draw(3, 3)
+			console:draw(love.graphics.getWidth() - 420, love.graphics.getHeight() - 146)
 			if player.showInventory == true then
-				love.mouse.setVisible(true)
 				inventoryGui:draw(player.inventoryXPosition, player.inventoryYPosition)
-			else
-				love.mouse.setVisible(false)
 			end
 		elseif game.paused == true then
 			pauseMenu:draw()
@@ -97,7 +107,7 @@ function love.draw()
 			love.graphics.printf("Memory Used In KB = " .. math.floor(collectgarbage('count')), 0, 15, 1024, 'center')
 			love.graphics.printf("FPS : " .. love.timer.getFPS(), 0, 30, 1024, 'center')
 			love.graphics.printf("Enemies Remaining " .. #enemies, 0, 45, 1024, 'center')
-			love.graphics.printf("", 0, 60, 1024, 'center')
+			love.graphics.printf("Player Gold = " .. player.gold, 0, 60, 1024, 'center')
 			love.graphics.printf("", 0, 75, 1024, 'center')
 			love.graphics.printf("", 0, 90, 1024, 'center')
 			if player.itemsInInventory == player.maxInventory then
@@ -106,6 +116,9 @@ function love.draw()
 				love.graphics.printf("Inventory not Full " .. player.maxInventory - player.itemsInInventory .. " empty slots", 0, 105, 1024, 'center')
 			end
 			love.graphics.printf("CmX = [" .. math.floor(camera.mx / tile.width) .. "] CmY = [" .. math.floor(camera.my / tile.height) .. "]", 0, 120, 1024, 'center')
+		end
+		if game.ready == false then
+			love.graphics.draw(loadingScreen, 0, 0)
 		end
 	elseif game.state == 'gameOver' then
 		love.graphics.setNewFont("Assets/Fonts/VT323.ttf", 120)
